@@ -10,7 +10,7 @@ import base64
 
 from sobrecargar import sobrecargar
 from solteron import Solteron
-from utiles_google.recurso import Recurso, TipoServicioGoogleApi
+from chastack_utiles_google.recurso import Recurso, TipoServicioGoogleApi
 
 Matriz : AliasDeTipo = Lista[Lista[Cualquiera]]
 

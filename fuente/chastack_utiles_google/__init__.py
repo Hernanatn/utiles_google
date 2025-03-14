@@ -10,9 +10,9 @@ Derechos de autor (c) 2025 Ch'aska SRL. Distribuído bajo licencia MIT.
 Autores:
  - Hernan ATN | herni@cajadeideas.ar 
 """
-import utiles_google.recurso
-import utiles_google.correo
-import utiles_google.hojas_de_calculo
+import chastack_utiles_google.recurso
+import chastack_utiles_google.correo
+import chastack_utiles_google.hojas_de_calculo
 
 if __name__ == '__main__':
     print(__doc__)
