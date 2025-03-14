@@ -4,6 +4,8 @@ from googleapiclient.discovery import build as construirRecurso, Resource as Rec
 from google.oauth2.service_account import Credentials as Credenciales
 
 from typing import Optional as Opcional
+from typing import Optional, List, Any, TypeAlias as AliasDeTipo, Mapping, Self, Dict, Iterable
+from typing import IO
 from mimetypes import guess_type as adivinarTipoMIME 
 from email.message import EmailMessage as CorreoElectronico
 from email.mime.audio import MIMEAudio
@@ -36,7 +38,7 @@ class Correo():
         mensaje.set_content(cuerpo)
         return cls(mensaje)
 
-    def anadirAdjunto(self, adjunto: IO[Any] | str)-> Self:
+    def anadirAdjunto(self, adjunto: IO[Any] | bytes |str)-> Self:
         tipoSubtipo, _ = adivinarTipoMIME(adjunto)
         tipoAdjunto, subtipoAdjunto = tipoSubtipo.split('/')
 
@@ -48,7 +50,7 @@ class Correo():
         else:
             raise TypeError(f'Adjunto debe ser IO, bytes o bien una str con la ruta al archivo. En cambio es {type(adjunto)}.')
 
-        self.add_attachment(dataAdjunto, tipoAdjunto, subtipoAdjunto,filename=adjunto)
+        self.__correoBase.add_attachment(dataAdjunto, tipoAdjunto, subtipoAdjunto,filename=adjunto)
         return self
 
     def codificar(self) -> Self:

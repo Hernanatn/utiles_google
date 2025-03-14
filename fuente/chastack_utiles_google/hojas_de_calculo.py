@@ -2,8 +2,10 @@ from googleapiclient.errors import HttpError as ErrorHttp
 from googleapiclient.http import HttpRequest as SolicitudHttp
 from googleapiclient.discovery import build as construirRecurso, Resource as Recurso
 from google.oauth2.service_account import Credentials as Credenciales
+from enum import Enum
 
 from typing import Optional as Opcional, List as Lista, Any as Cualquiera, TypeAlias as AliasDeTipo
+from typing import Optional, List, Any, TypeAlias as AliasDeTipo, Mapping, Self, Dict, Iterable
 
 import json
 import base64
@@ -16,26 +18,26 @@ Matriz : AliasDeTipo = Lista[Lista[Cualquiera]]
 
 class HojaDeCalculo:
     __slots__ = ('__servicio','id')
-    __servicio : gSheets
+    __servicio : 'gSheets'
     id : str
 
     class ModoEscribir(Enum):
-        _invalido = 0,
-        ACTUALIZAR = 1,
+        _invalido = 0
+        ACTUALIZAR = 1
         AGREGAR = 2
 
     @sobrecargar
-    def __init__(self, servicio : gSheets, titulo : str):
+    def __init__(self, servicio : 'gSheets', titulo : str):
         """Crea una nueva hoja"""
         self.__servicio = servicio
         self.id = self.__servicio.crear(titulo).get('spreadsheetId')
 
     @sobrecargar
-    def __init__(self, servicio : gSheets, data_hoja : dict):
+    def __init__(self, servicio : 'gSheets', data_hoja : dict):
         self.__servicio = servicio
         self.id = data_hoja.get('spreadsheetId')
 
-    def escribir(self, rango_celdas : str, data_a_escribir : Matriz,modo : HojaDeCalculo.ModoEscribir = self.ModoEscribir.ACTUALIZAR):
+    def escribir(self, rango_celdas : str, data_a_escribir : Matriz,modo : HojaDeCalculo.ModoEscribir = HojaDeCalculo.ModoEscribir.ACTUALIZAR):
         return self.__servicio.escribir(self.id, rango_celdas, data_a_escribir, modo)
 
     def leer(self, rango_celdas:str) -> Opcional[Matriz]:

@@ -2,17 +2,22 @@ from googleapiclient.errors import HttpError as ErrorHttp
 from googleapiclient.http import HttpRequest as SolicitudHttp
 from googleapiclient.discovery import build as construirRecurso, Resource as Recurso
 from google.oauth2.service_account import Credentials as Credenciales
+
 from enum import Enum
+
+from typing import Optional, List, Any, TypeAlias as AliasDeTipo, Mapping, Self, Dict, Iterable
 
 import json
 import base64
 
+from solteron import Solteron
+
 class TipoServicioGoogleApi(Enum):
-    _invalido = 0,
-    DRIVE = 1,
-    DOCS = 2,
-    SHEETS = 3,
-    GMAIL = 4,
+    _invalido = 0
+    DRIVE = 1
+    DOCS = 2
+    SHEETS = 3
+    GMAIL = 4
     CALENDAR = 5
 
 INFO_GOOGLE_APIS : dict  = {
