@@ -26,18 +26,11 @@ class HojaDeCalculo:
         ACTUALIZAR = 1
         AGREGAR = 2
 
-    @sobrecargar
-    def __init__(self, servicio : 'gSheets', titulo : str):
-        """Crea una nueva hoja"""
-        self.__servicio = servicio
-        self.id = self.__servicio.crear(titulo).get('spreadsheetId')
-
-    @sobrecargar
     def __init__(self, servicio : 'gSheets', data_hoja : dict):
         self.__servicio = servicio
         self.id = data_hoja.get('spreadsheetId')
 
-    def escribir(self, rango_celdas : str, data_a_escribir : Matriz,modo : HojaDeCalculo.ModoEscribir = HojaDeCalculo.ModoEscribir.ACTUALIZAR):
+    def escribir(self, rango_celdas : str, data_a_escribir : Matriz,modo : ModoEscribir = ModoEscribir.ACTUALIZAR):
         return self.__servicio.escribir(self.id, rango_celdas, data_a_escribir, modo)
 
     def leer(self, rango_celdas:str) -> Opcional[Matriz]:
@@ -50,10 +43,8 @@ class HojaDeCalculo:
         return self.__servicio.eliminar(self.id)
 
 class gSheets(Recurso):
-    __slots__ = ('__recursoSubyacente',)
-    __recursoSubyacente : Recurso
-
-    def __init__(self, credencialesJSON : Mapping[str,str], remitente : str):
+    
+    def __init__(self, credencialesJSON : Mapping[str,str]):
         super().__init__(
             credencialesJSON=credencialesJSON,
             servicio=TipoServicioGoogleApi.SHEETS
@@ -66,24 +57,24 @@ class gSheets(Recurso):
             }
         }
         try:
-            nueva_hoja = self.__recursoSubyacente   \
+            nueva_hoja = self._Recurso__recursoSubyacente   \
                             .spreadsheets()         \
                             .create(
                                 body=metadata,
                                 fields='spreadsheetId'
-                            )
+                            ).execute()
 
             return HojaDeCalculo(
                 self,
                 nueva_hoja
             ) 
-        except HttpError as error:
+        except ErrorHttp as error:
             print(f"[ERROR] Ocurrió un error al tratar de crear la hoja {titulo_nueva_hoja}: {error}\n")
             raise
     
     def leer(self, id_hoja : str, rango_celdas : str) -> Opcional[Matriz]:
         try:
-            resultado = self.__recursoSubyacente \
+            resultado = self._Recurso__recursoSubyacente \
                             .spreadsheets()       \
                             .values()              \
                             .get(
@@ -95,13 +86,13 @@ class gSheets(Recurso):
             if not valores:
                 valores = False 
             return valores    
-        except HttpError as error:
+        except ErrorHttp as error:
             print(f"[ERROR] Ocurrió un error al tratar de leer los valores del rango {rango_celdas}, de la hoja de ID {id_hoja}: {error}\n")
             raise
     
     def escribir(self, id_hoja : str, rango_celdas : str, data_a_escribir : Matriz, modo : HojaDeCalculo.ModoEscribir = HojaDeCalculo.ModoEscribir.ACTUALIZAR):
         try:
-            solicitud = self.__recursoSubyacente.spreadsheets().values()
+            solicitud = self._Recurso__recursoSubyacente.spreadsheets().values()
             parametros : dict = dict(
                 spreadsheetId = id_hoja, 
                 range = rango_celdas, 
@@ -116,7 +107,7 @@ class gSheets(Recurso):
             resultado = solicitud.execute()
             return resultado
 
-        except HttpError as error:
+        except ErrorHttp as error:
             print(f"[ERROR] Ocurrió un error al tratar de escribir en la hoja de ID {id_hoja}: {error}\n")
             raise
 
@@ -124,20 +115,23 @@ class gSheets(Recurso):
     def borrar(self, id_hoja: str, rango_celdas : str):
         try:
             
-            resultado = self.__recursoSubyacente.spreadsheets().values().clear(spreadsheetId=id_hoja, range=rango_celdas).execute()
+            resultado = self._Recurso__recursoSubyacente.spreadsheets().values().clear(spreadsheetId=id_hoja, range=rango_celdas).execute()
             print(f'Se borraron los valores del rango indicado satisfactoriamente: \n{json.dumps(resultado, indent=4,sort_keys=True)}\n')
-        except HttpError as error:
+        except ErrorHttp as error:
             print(f"Ocurrió un error al tratar de borrar los valores del rango {rango_celdas}, de la hoja de ID {id_hoja}: {error}\n")
             resultado = None
         return resultado
 
     def eliminar(self,id_hoja : str): 
         try:
-            resultado =self.__recursoSubyacente.spreadsheets().delete(spreadsheetId=id_hoja)
+            resultado =self._Recurso__recursoSubyacente.spreadsheets().delete(spreadsheetId=id_hoja)
             print(f'Se eliminó la hoja satisfactoriamente: \n{json.dumps(resultado, indent=4,sort_keys=True)}\n')
 
-        except HttpError as error:
+        except ErrorHttp as error:
             print(f"Ocurrió un error al tratar de eliminar la hoja de ID {id_hoja}: {error}\n")
             resultado = None
         print()
         return resultado
+
+    #def __del__(self):
+    #    super().__del__()

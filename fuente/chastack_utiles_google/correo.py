@@ -90,8 +90,6 @@ class CorreoHTML():
         return self.__correoCodificado
 
 class gMail(Recurso):
-    __slots__ = ('__recursoSubyacente',)
-    __recursoSubyacente : Recurso
 
     def __init__(self, credencialesJSON : Mapping[str,str], remitente : str):
         super().__init__(
@@ -102,19 +100,21 @@ class gMail(Recurso):
 
     def enviarCorreo(self, correo : Correo | CorreoHTML):
         try:
-            enviarMensaje = self.__recursoSubyacente \
+            enviarMensaje = self._Recurso__recursoSubyacente \
                             .users()                  \
                             .messages()                \
                             .send(
                                 userId="me",
                                 body=correo.mensajeCodificado()
                             ).execute()
+            return enviarMensaje 
         except ErrorHttp as error: 
             enviarMensaje = None
             raise(error)
 
-        return enviarMensaje 
 
+    #def __del__(self):
+    #    super().__del__()
 
 
 if __name__ == '__main__':

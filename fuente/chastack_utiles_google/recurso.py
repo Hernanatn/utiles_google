@@ -75,7 +75,7 @@ class Recurso(metaclass=Solteron):
 
         credenciales_montadas : Credenciales = Credenciales.from_service_account_info(INFO_CUENTA_DE_SERVICIO, scopes=ENDPOINTS_HABILITADOS, **nominales)
         try:
-            recurso_autorizado = construirRecurso(SERVICIO.get('nombres'), SERVICIO.get('version'), credentials=credenciales_montadas)
+            recurso_autorizado = construirRecurso(SERVICIO.get('nombre'), SERVICIO.get('version'), credentials=credenciales_montadas)
         except ErrorHttp as error:
             recurso_autorizado = None
             raise error
@@ -83,6 +83,4 @@ class Recurso(metaclass=Solteron):
 
     def __del__(self):
         self.__recursoSubyacente.close()
-    
-        return enviarMensaje 
 
